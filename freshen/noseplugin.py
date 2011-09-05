@@ -16,7 +16,7 @@ from nose.util import isclass
 
 from freshen.core import TagMatcher, load_language, load_feature, StepsRunner
 from freshen.prettyprint import FreshenPrettyPrint
-from freshen.stepregistry import StepImplLoader, StepImplRegistry
+from freshen.stepregistry import StepImplLoader, StepImplRegistry, run_all_hooks
 from freshen.stepregistry import UndefinedStepImpl, StepImplLoadException
 from freshen.test.base import FeatureSuite, FreshenTestCase, ExceptionWrapper
 
@@ -266,3 +266,8 @@ class FreshenNosePlugin(Plugin):
                 ret.append(FreshenPrettyPrint.step_passed(step))
         return "\n".join(ret)
 
+    def beforeTest(self, test):
+        run_all_hooks('before', test)
+
+    def afterTest(self, test):
+        run_all_hooks('after', test)

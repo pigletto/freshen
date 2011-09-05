@@ -7,7 +7,7 @@ import sys
 import traceback
 from itertools import chain
 
-__all__ = ['Given', 'When', 'Then', 'Before', 'After', 'AfterStep', 'Transform', 'NamedTransform']
+__all__ = ['Given', 'When', 'Then', 'Before', 'After', 'AfterStep', 'BeforeAll', 'AfterAll', 'Transform', 'NamedTransform']
 __unittest = 1
 
 log = logging.getLogger('freshen')
@@ -262,6 +262,22 @@ def hook_decorator(cb_type):
             return d
     return decorator_wrapper
 
+all_steps = {'before':[], 'after':[]}
+
+def all_decorator(cb_type):
+    def dec_before(f):
+        all_steps['before'].append(f)
+        return f
+
+    def dec_after(f):
+        all_steps['after'].append(f)
+        return f
+    return cb_type == 'before' and dec_before or dec_after
+
+def run_all_hooks(cb_type, test):
+    for f in all_steps[cb_type]:
+        f(test)
+
 def transform_decorator(spec_fragment):
     def wrapper(func):
         return TransformImpl(spec_fragment, func)
@@ -279,5 +295,7 @@ Then = step_decorator('then')
 Before = hook_decorator('before')
 After = hook_decorator('after')
 AfterStep = hook_decorator('after_step')
+BeforeAll = all_decorator('before')
+AfterAll = all_decorator('after')
 Transform = transform_decorator
 NamedTransform = named_transform_decorator
