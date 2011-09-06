@@ -68,6 +68,7 @@ class FreshenNosePlugin(Plugin):
     # This makes it so that freshen's formatFailure gets called before capture
     # and logcapture - those plugins replace and obscure the true exception value
     score = 1000
+    before_all_executed = False
 
     def options(self, parser, env):
         super(FreshenNosePlugin, self).options(parser, env)
@@ -267,7 +268,9 @@ class FreshenNosePlugin(Plugin):
         return "\n".join(ret)
 
     def beforeTest(self, test):
-        run_all_hooks('before', test)
+        if not self.before_all_executed:
+            self.before_all_executed = True
+            run_all_hooks('before')
 
-    def afterTest(self, test):
-        run_all_hooks('after', test)
+    def finalize(self, test):
+        run_all_hooks('after')

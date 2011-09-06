@@ -274,9 +274,9 @@ def all_decorator(cb_type):
         return f
     return cb_type == 'before' and dec_before or dec_after
 
-def run_all_hooks(cb_type, test):
+def run_all_hooks(cb_type):
     for f in all_steps[cb_type]:
-        f(test)
+        f()
 
 def transform_decorator(spec_fragment):
     def wrapper(func):
